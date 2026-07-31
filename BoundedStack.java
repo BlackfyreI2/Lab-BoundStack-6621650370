@@ -1,8 +1,9 @@
 import java.util.NoSuchElementException;
 
+
 public class BoundedStack<E> {
 
-
+   
 
     private final Object[] elements;
     private final int capacity;
