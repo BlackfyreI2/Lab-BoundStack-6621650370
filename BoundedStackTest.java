@@ -37,4 +37,16 @@ public class BoundedStackTest {
         TestRunner.assertTrue(stack.isEmpty(), "Stack is empty after pops");
         TestRunner.assertThrows(NoSuchElementException.class, stack::pop, "Pop on empty stack throws Exception");
     }
+
+    private static void testCopyProducer() {
+        System.out.println("\n--- Test Copy Producer ---");
+        BoundedStack<String> original = new BoundedStack<>(3);
+        original.push("X");
+        
+        BoundedStack<String> copy = original.copy();
+        TestRunner.assertEquals(original.size(), copy.size(), "Copy has same size");
+        
+        copy.push("Y");
+        TestRunner.assertEquals(1, original.size(), "Modifying copy does not affect original stack");
+    }
 }
