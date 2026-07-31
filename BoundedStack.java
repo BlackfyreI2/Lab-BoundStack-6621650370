@@ -58,4 +58,17 @@ public class BoundedStack<E> {
         }
         return (E) elements[size - 1];
     }
+
+    @SuppressWarnings("unchecked")
+    public E pop() {
+        checkRep();
+        if (isEmpty()) {
+            throw new NoSuchElementException("Stack is empty");
+        }
+        size--;
+        E item = (E) elements[size];
+        elements[size] = null; // Clean reference to prevent memory leak
+        checkRep();
+        return item;
+    }
 }
