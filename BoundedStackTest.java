@@ -25,4 +25,16 @@ public class BoundedStackTest {
         TestRunner.assertThrows(IllegalStateException.class, () -> stack.push("C"), "Push on full stack throws Exception");
         TestRunner.assertThrows(IllegalArgumentException.class, () -> stack.push(null), "Push null throws Exception");
     }
+
+    private static void testPopAndUnderflow() {
+        System.out.println("\n--- Test Pop & Underflow ---");
+        BoundedStack<Integer> stack = new BoundedStack<>(2);
+        stack.push(10);
+        stack.push(20);
+
+        TestRunner.assertEquals(20, stack.pop(), "Pop returns last pushed item");
+        TestRunner.assertEquals(10, stack.pop(), "Pop returns remaining item");
+        TestRunner.assertTrue(stack.isEmpty(), "Stack is empty after pops");
+        TestRunner.assertThrows(NoSuchElementException.class, stack::pop, "Pop on empty stack throws Exception");
+    }
 }
