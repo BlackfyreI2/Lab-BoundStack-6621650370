@@ -36,4 +36,26 @@ public class BoundedStack<E> {
     public int capacity() { return capacity; }
     public boolean isEmpty() { return size == 0; }
     public boolean isFull() { return size == capacity; }
+
+    public void push(E item) {
+        checkRep();
+        if (item == null) {
+            throw new IllegalArgumentException("Null item not allowed");
+        }
+        if (isFull()) {
+            throw new IllegalStateException("Stack is full");
+        }
+        elements[size] = item;
+        size++;
+        checkRep();
+    }
+
+    @SuppressWarnings("unchecked")
+    public E peek() {
+        checkRep();
+        if (isEmpty()) {
+            throw new NoSuchElementException("Stack is empty");
+        }
+        return (E) elements[size - 1];
+    }
 }
