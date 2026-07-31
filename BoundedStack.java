@@ -71,4 +71,16 @@ public class BoundedStack<E> {
         checkRep();
         return item;
     }
+
+    public BoundedStack<E> copy() {
+        checkRep();
+        BoundedStack<E> cloned = new BoundedStack<>(this.capacity);
+        for (int i = 0; i < this.size; i++) {
+            @SuppressWarnings("unchecked")
+            E item = (E) this.elements[i];
+            cloned.push(item);
+        }
+        checkRep();
+        return cloned;
+    }
 }
