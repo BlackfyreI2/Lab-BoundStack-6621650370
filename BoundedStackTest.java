@@ -1,6 +1,13 @@
+import java.util.NoSuchElementException;
+
 public class BoundedStackTest {
     public static void main(String[] args) {
+       
         testConstructor();
+        testPushAndPeek();       
+        testPopAndUnderflow();  
+        testCopyProducer();      
+
         TestRunner.printSummary();
     }
 
