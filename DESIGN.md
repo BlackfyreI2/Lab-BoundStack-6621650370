@@ -1,16 +1,12 @@
-# Design Document: BoundedStack ADT
+1. ภาพรวมและการตัดสินใจออกแบบ (Overview & Design Decisions)ประเภทของ ADT: เป็น Mutable Stack (เปลี่ยนค่าภายในได้) ที่รองรับ Generic Type  และทำงานแบบ Last-In-First-Out โครงสร้างภายใน เลือกใช้ Array (Object[]) ในการเก็บข้อมูล เพราะมีประสิทธิภาพสูง ทำงานได้รวดเร็ว และใช้หน่วยความจำน้อยกว่า ArrayList null  ไม่อนุญาตให้ใส่ข้อมูล null เพื่อป้องกันความสับสนของสถานะภายในและการเกิด Bug การป้องกันข้อมูลรั่วไหล: ซ่อนตัวแปรภายในด้วย private ทั้งหมด และไม่มีการส่งคืนตัวแปรอาเรย์ออกไปข้างนอกตรง ๆ เมธอด copy() จะสร้างออบเจกต์ใบใหม่ขึ้นมาแทน
 
-## Design Decisions
-- **Mutability**: Mutable (ตามมาตรฐาน Stack)
-- **Base Structure**: Array (`Object[]`) เพื่อประสิทธิภาพ $\mathcal{O}(1)$
-- **Null Policy**: ไม่อนุญาตให้ใส่ `null`
-- **Overflow Policy**: โยน `IllegalStateException`
-- **Underflow Policy**: โยน `NoSuchElementException`
-
-## Operations Specification
-- `BoundedStack(int capacity)`: Creator (capacity > 0)
-- `push(E item)`: Mutator (item != null, size < capacity)
-- `pop()`: Mutator (size > 0)
-- `peek()`: Observer (size > 0)
-- `size()`, `capacity()`, `isEmpty()`, `isFull()`: Observer
-- `copy()`: Producer
+2.สเปกของทุกฟังก์ชัน (Operations Specification)
+2.1 กลุ่มสร้างสแต็ก (Creator)BoundedStack เงื่อนไขก่อนเรียก (requires): -ส่วนที่เปลี่ยนแปลง (modifies): thisผลลัพธ์ (effects): สร้างสแต็กว่างใหม่ที่มีความจุสูงสุดเท่ากับ capacityการโยน Exception (throws): โยน IllegalArgumentException ถ้าผู้ใช้ระบุ capacity <= 0
+   
+2.2 กลุ่มสร้างสแต็กใบใหม่ (Producer)BoundedStack<E> copy()เงื่อนไขก่อนเรียก (requires): -ส่วนที่เปลี่ยนแปลง (modifies): -ผลลัพธ์ (effects): คืนค่าสแต็กใบใหม่ที่มีข้อมูลและความจุเหมือนสแต็กเดิมทุกประการ โดยการแก้ไขสแต็กใหม่จะไม่มีผลกระทบใด ๆ กับสแต็กเดิม
+   
+2.3 กลุ่มปรับเปลี่ยนข้อมูล (Mutators)void push(E item)เงื่อนไขก่อนเรียก (requires): item ต้องไม่เป็น null และสแต็กยังไม่เต็มส่วนที่เปลี่ยนแปลง (modifies): thisผลลัพธ์ (effects): วาง item ลงบนยอดสแต็ก (Top) และเพิ่มจำนวนขนาด (size) ขึ้น 1การโยน Exception (throws):โยน IllegalArgumentException ถ้าใส่ค่า item == nullโยน IllegalStateException ถ้าสแต็กเต็มแล้ว (isFull() == true)E pop()เงื่อนไขก่อนเรียก (requires): สแต็กต้องไม่ว่างส่วนที่เปลี่ยนแปลง (modifies): thisผลลัพธ์ (effects): ดึงข้อมูลตัวบนสุดออก คืนค่าข้อมูลนั้น ลดขนาด (size) ลง 1 และทำการคืนพื้นที่หน่วยความจำ (null) เพื่อป้องกันปัญหา Memory Leakการโยน Exception (throws): โยน NoSuchElementException ถ้าพยายามดึงข้อมูลตอนสแต็กว่าง (isEmpty() == true)
+   
+2.4 กลุ่มอ่าน/ตรวจสอบสถานะ (Observers)E peek()เงื่อนไขก่อนเรียก (requires): สแต็กต้องไม่ว่างส่วนที่เปลี่ยนแปลง (modifies): -ผลลัพธ์ (effects): แอบดูและคืนค่าข้อมูลตัวบนสุด โดยไม่มีการลบข้อมูลนั้นออกจากสแต็กการโยน Exception (throws): โยน NoSuchElementException ถ้าสแต็กว่างint size()ผลลัพธ์ (effects): คืนค่าจำนวนข้อมูลปัจจุบันในสแต็กint capacity()ผลลัพธ์ (effects): คืนค่าความจุสูงสุดของสแต็กboolean isEmpty()ผลลัพธ์ (effects): คืนค่า true หากไม่มีข้อมูลในสแต็กเลย (size == 0)boolean isFull()ผลลัพธ์ (effects): คืนค่า true หากสแต็กมีข้อมูลเต็มความจุแล้ว (size == capacity)
+   
+3. ความถูกต้องของสถานะภายใน (AF, RI และ checkRep)Abstraction Function (AF)อธิบายการแปลความหมายจากอาเรย์ภายในไปเป็น Stack (RI) เงื่อนไขความถูกต้องของข้อมูลภายในที่จะต้องเป็นจริงเสมอ:elements ต้องไม่เป็น nullcapacity ต้องมากกว่า 0ขนาดของอาเรย์ elements.length ต้องเท่ากับ capacityค่า size ต้องอยู่ระหว่าง 0 ถึง capacity ช่องอาเรย์ที่มีข้อมูล  ต้องไม่เป็น nullช่องอาเรย์ที่ยังไม่ได้ใช้งาน  ต้องเป็น null เสมอการตรวจสอบด้วย checkRep()ผมได้เขียนเมธอด checkRep() เพื่อตรวจสอบเงื่อนไข RI ข้างต้นทั้งหมดด้วยคำสั่ง assert โดยมีการเรียกใช้อย่างรัดกุมที่ จุดเริ่มต้นและจุดสิ้นสุด ของทุก Public Operation เพื่อมั่นใจได้ว่าสถานะของสแต็กถูกต้องสมบูรณ์ตลอดเวลาครับ
